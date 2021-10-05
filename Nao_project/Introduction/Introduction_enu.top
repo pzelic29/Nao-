@@ -1,0 +1,60 @@
+topic: ~Introduction()
+language: enu
+
+# Defining needed concepts, keywords or sentences corresponding to a concept.
+concept:(yes) [yes "all right" sure "why not" ok certainly "very well" yep yea definitely amen]
+concept:(no) [no nope "don't want" "no way" never "not at all"]
+concept:(how) ["how are you" howdy "what's up" "how do you feel"]
+concept:(happy) [ok fine great happy blessed "all right" glad "not bad"]
+concept:(sad) [sad miserable bad unhappy tired]
+concept:(repeat) [repeat understand]
+concept:(thx) ["thank you" thanks gracias "much obliged" merci]
+concept:(hello) [hello hi hey "good morning" greetings]
+concept:(bye) [bye goodbye "bye bye" "tata" "see you" adios cheerio "so long" farewell "have a nice day"]
+
+
+u:(~hello) Hello human $hellohuman=1 ^goto(askusername)
+
+u:(your name) %askusername What is your name? ^goto(username)
+u:(my name is _*) %username Nice to meet you $name=$1 $1 ^goto(howAreYou)
+u:(what is my name) ^first["your name is $name" "I don't know"]
+   u1:(no) OK ^clear(name)
+# If User asks how the robot feels, it starts a random animation being tagged "myself",
+# answers and go to the label %howAreYou
+u:(~how) ^startTag(myself) I'm fine, thank you. And you, ^goto(howAreYou)
+
+# The robot asks how the user feels. 3 kind of answers are expected
+# Expressed by concept, user can be happy, sad or ask the robot to repeat the question.
+proposal: %howAreYou ^startTag(show) how are you today?
+    u1:(~happy) I'm glad you are fine! ^goto(favoriteColor)
+    u1:(~sad) Oh, I feel sorry for you. ^nextProposal
+    u1:(~repeat) I'll repeat for you. ^sameProposal
+
+proposal: If you feel like talking about it, don't hesitate.
+  
+proposal: %germany Do you want to start a lession?
+    u1:(~yes) Let's start $germany=1
+    u1:(~no) Ok, anytime.  ^sameProposal
+
+
+# the robot asks User for his prefered color between blue and red.
+# this illustrate variables stored in $1 using '_' character.
+proposal: %favoriteColor And what is your favorite color between Blue and Red ? 
+    u1:(violet) Violet is my prefered color too ! 
+    u1:(_[blue red]) $1 is a very nice color and my prefered is violet. ^goto(germany)
+    u1:(_[green yellow pink orange purple white black]) $1 is a nice color. ^sameProposal
+
+
+# On any proposal if user asks to repeat, say again the same proposal.
+u:(~repeat) I'll repeat for you. ^sameProposal
+
+# Being polite, the robot always answers accordingly to thankfull sentences.
+u:(~thx) You're welcome
+
+
+# Exiting.
+# Answering to Goodbye and exiting the dialog box, stimulating the onStopped output slot.
+u:(~bye) ~bye $onStopped=1
+
+u:(what do you know) I know english and germany. $germany=1
+u:(quiz) Let's start. $startquiz=1
